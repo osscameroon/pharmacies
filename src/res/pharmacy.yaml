@@ -14,3 +14,8 @@ items:
     opening_days: "3"
     location: "4"
     city: Douala
+  - name: M1
+    opening_hours: M2
+    opening_days: M3
+    location: M4
+    city: Douala
