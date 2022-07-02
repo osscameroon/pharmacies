@@ -26,31 +26,31 @@ jobs:
       - run: |
           cat pharmacy_submission.json | jq
 
-#       - name: Set convert json to yaml
-#         shell: bash
-#         run: |
-#           cat pharmacy_submission.json | yq e '{"items": [.]}' -P - > pharmacy_submission.yaml
-#
-#       - run: cat pharmacy_submission.yaml
-#
-#       - run: cat ./src/res/pharmacy.yaml
-#
-#       - name: Set convert json to yaml
-#         shell: bash
-#         run: |
-#           yq ea '. as $item ireduce ({}; . *+ $item)' -i ./src/res/pharmacy.yaml pharmacy_submission.yaml
-#
-#       - run: cat ./src/res/pharmacy.yaml
-#
-#       - name: Commit changes
-#         shell: bash
-#         run: |
-#           git config --global user.email "github-actions[bot]@users.noreply.github.com" && \
-#           git config --global user.name "github-actions[bot]" && \
-#           git add ./src/res/pharmacy.yaml && \
-#           git commit -m 'new pharmacy answer' && \
-#           git push
-#
-#       - uses: peter-evans/close-issue@v1
-#         with:
-#           comment: Your pharmacy answer was submitted and will be deployed in few minutes here https://devpharmacy.osscameroon.com.
+      - name: Set convert json to yaml
+        shell: bash
+        run: |
+          cat pharmacy_submission.json | yq e '{"items": [.]}' -P - > pharmacy_submission.yaml
+
+      - run: cat pharmacy_submission.yaml
+
+      - run: cat ./src/res/pharmacy.yaml
+
+      - name: Set convert json to yaml
+        shell: bash
+        run: |
+          yq ea '. as $item ireduce ({}; . *+ $item)' -i ./src/res/pharmacy.yaml pharmacy_submission.yaml
+
+      - run: cat ./src/res/pharmacy.yaml
+
+      - name: Commit changes
+        shell: bash
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com" && \
+          git config --global user.name "github-actions[bot]" && \
+          git add ./src/res/pharmacy.yaml && \
+          git commit -m 'new pharmacy answer' && \
+          git push
+
+      - uses: peter-evans/close-issue@v1
+        with:
+          comment: Your pharmacy answer was submitted and will be deployed in few minutes here https://devpharmacy.osscameroon.com.
