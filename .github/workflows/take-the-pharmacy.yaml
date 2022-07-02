@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     if: contains(github.event.issue.title, 'DO NOT EDIT')
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           token: ${{ secrets.GA_WORKFLOW_DEPLOYMENTS_TOKEN }}
 
