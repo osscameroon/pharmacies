@@ -4,9 +4,13 @@ items:
     opening_days: "Mon-Sun"
     opening_hours: "17h a 23h"
     location: "Ekounou"
-
   - name: "Pharmacie de la mort"
     city: "Mora"
     opening_days: "Mon-Sun"
     opening_hours: "8h a 17h"
     location: "Mora centre"
+  - name: "1"
+    opening_hours: "2"
+    opening_days: "3"
+    location: "4"
+    city: Douala
