@@ -1,0 +1,12 @@
+items:
+  - name: "Aser paracetamol"
+    city: "Yaounde"
+    opening_days: "Mon-Sun"
+    opening_hours: "17h a 23h"
+    location: "Ekounou"
+
+  - name: "Pharmacie de la mort"
+    city: "Mora"
+    opening_days: "Mon-Sun"
+    opening_hours: "8h a 17h"
+    location: "Mora centre"
