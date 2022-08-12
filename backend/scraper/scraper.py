@@ -8,7 +8,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from parsel import Selector
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.remote.errorhandler import NoSuchElementException, InvalidSelectorException
+from selenium.webdriver.remote.errorhandler import NoSuchElementException, InvalidSelectorException, \
+    ElementClickInterceptedException
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 driver.maximize_window()
@@ -19,7 +20,7 @@ search_input.send_keys('Pharmacies')
 sleep(3)
 search_input.send_keys(Keys.ENTER)
 
-sleep(8)
+sleep(14)
 
 query_results = driver.find_element(
     By.CSS_SELECTOR,
@@ -63,16 +64,25 @@ pharmacies_locations = []
 iterator = 3
 
 for item in range(len(total_elements)):
-    driver.find_element(
-        By.XPATH,
-        f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
-    ).click()
-    sleep(4)
+    print(iterator)
+    try:
+        driver.find_element(
+            By.XPATH,
+            f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
+        ).click()
+    except ElementClickInterceptedException:
+        driver.execute_script(
+            "arguments[0].click();", driver.find_element(
+                By.XPATH,
+                f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
+            )
+        )
+    sleep(30)
     location = driver.find_element(
-        By.XPATH,
-        '//*[@id="QA0Szd"]/div/div/div[1]/div[3]/div/div[1]/div/div/div[2]/div[9]/div[3]/button/div[1]/div[2]/div[1]'
+        By.CSS_SELECTOR,
+        'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
     ).text
-    iterator = +2
+    iterator = iterator + 2
     pharmacies_locations.append(location)
 
 with open('pharmacies.csv', 'w') as csv_file:
