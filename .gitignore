@@ -102,3 +102,9 @@ dist
 
 # TernJS port file
 .tern-port
+
+
+# generated files from ide
+*history*
+*idea*
+*vscode*
