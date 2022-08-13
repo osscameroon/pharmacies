@@ -194,6 +194,6 @@ with open('pharmacies.csv', 'w') as csv_file:
         driver.switch_to.window(driver.window_handles[1])
         sleep(2)
         new_iterator = new_iterator + 2
-        print(new_iterator)
         print(f'{(new_iterator - 3) / 2} ===> {[name, location, contact, rating, latitude, longitude]}')
     csv_file.close()
+driver.close()
