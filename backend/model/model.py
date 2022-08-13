@@ -41,4 +41,4 @@ db.session.add(
 db.session.commit()
 
 pharmacies = pd.read_csv('../scraper/pharmacies.csv')
-pharmacies.to_sql('pharmacies', con=db.engine, if_exists='append', index=False)
+pharmacies.to_sql('pharmacies', con=db.engine, if_exists='replace', index=False)
