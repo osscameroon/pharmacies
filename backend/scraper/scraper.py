@@ -89,8 +89,9 @@ with open('pharmacies.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
     writer.writerow(fields)
     for code in pharmacies_locations:
-        driver.execute_script("window.open('https://developers.google.com/maps/documentation/geocoding/overview',"
+        driver.execute_script("window.open('',"
                               "'_blank')")
+        driver.get("https://developers-dot-devsite-v2-prod.appspot.com/maps/documentation/utils/geocoder")
         sleep(16)
         code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
         code_converter_input.send_keys(Keys.CLEAR)
@@ -101,8 +102,12 @@ with open('pharmacies.csv', 'w') as csv_file:
         if driver.find_element(By.CSS_SELECTOR, '#status-line>span.OK'):
             full_location = driver.find_element(
                 By.CSS_SELECTOR,
-                '#result-0>table>tbody>tr>td:nth-child(2)>p.result-location'
-            ).text.replace('Location:', '').replace('', '').replace(',,', ',').split()
+                '#details-result-0>p.result-bounds'
+            ).text.split()
+            [full_location.pop() for i in range(2)]
+            full_location.pop(0)
+            full_location = full_location[0]
+            full_location.split(',')
             longitude = full_location[0]
             latitude = full_location[1]
         elif driver.find_element(By.CSS_SELECTOR, '#status-line>span.ZERO_RESULTS'):
@@ -111,10 +116,14 @@ with open('pharmacies.csv', 'w') as csv_file:
             code_converter_input.send_keys(Keys.ENTER)
             full_location = driver.find_element(
                 By.CSS_SELECTOR,
-                '#result-0>table>tbody>tr>td:nth-child(2)>p.result-location'
-            ).text.replace('Location:', '').replace('', '').replace(',,', ',').split()
+                '#details-result-0>p.result-bounds'
+            ).text.split()
+            [full_location.pop() for i in range(2)]
+            full_location.pop(0)
+            full_location = full_location[0]
+            full_location.split(',')
             longitude = full_location[0]
-            latitude = full_location[2]
+            latitude = full_location[1]
         else:
             full_location = ['unknown', 'unknown']
             location = full_location[0]
