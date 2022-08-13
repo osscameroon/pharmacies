@@ -94,7 +94,7 @@ with open('pharmacies.csv', 'w') as csv_file:
     sleep(6)
     for code in pharmacies_locations:
         code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
-        code_converter_input.send_keys(Keys.CLEAR)
+        code_converter_input.clear()
         sleep(1)
         code_converter_input.send_keys(code)
         code_converter_input.send_keys(Keys.ENTER)
@@ -113,7 +113,7 @@ with open('pharmacies.csv', 'w') as csv_file:
             latitude = full_location[1]
         except NoSuchElementException:
             new_converter_query = code.split().pop(1)
-            code_converter_input.send_keys(Keys.CLEAR)
+            code_converter_input.clear()
             code_converter_input.send_keys(new_converter_query)
             code_converter_input.send_keys(Keys.ENTER)
             full_location = driver.find_element(
@@ -130,7 +130,7 @@ with open('pharmacies.csv', 'w') as csv_file:
             full_location = ['unknown', 'unknown']
             location = full_location[0]
             latitude = full_location[1]
-        code_converter_input.send_keys(Keys.CLEAR)
+        code_converter_input.clear()
         driver.switch_to.window(driver.window_handles[0])
         name = driver.find_element(
             By.XPATH,
