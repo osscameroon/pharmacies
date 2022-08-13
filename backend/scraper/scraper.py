@@ -112,8 +112,8 @@ with open('pharmacies.csv', 'w') as csv_file:
             longitude = full_location[0]
             latitude = full_location[1]
         except NoSuchElementException:
+            new_converter_query = code.split().pop(1)
             try:
-                new_converter_query = code.split().pop(1)
                 code_converter_input.clear()
                 code_converter_input.send_keys(new_converter_query)
                 code_converter_input.send_keys(Keys.ENTER)
@@ -139,13 +139,11 @@ with open('pharmacies.csv', 'w') as csv_file:
                     longitude = full_location[0]
                     latitude = full_location[1]
                 except NoSuchElementException:
-                    full_location = ['unknown', 'unknown']
-                    location = full_location[0]
-                    latitude = full_location[1]
+                    location = 'unknown'
+                    latitude = 'unknown'
         except InvalidSelectorException:
-            full_location = ['unknown', 'unknown']
-            location = full_location[0]
-            latitude = full_location[1]
+            location = 'unknown'
+            latitude = 'unknown'
         code_converter_input.clear()
         driver.switch_to.window(driver.window_handles[0])
         name = driver.find_element(
@@ -194,6 +192,6 @@ with open('pharmacies.csv', 'w') as csv_file:
         driver.switch_to.window(driver.window_handles[1])
         sleep(2)
         new_iterator = new_iterator + 2
-        print(f'{(new_iterator - 3) / 2} ===> {[name, location, contact, rating, latitude, longitude]}')
+        print(f'{int((new_iterator - 3) / 2)} ===> {[name, location, contact, rating, latitude, longitude]}')
     csv_file.close()
 driver.close()
