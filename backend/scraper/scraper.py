@@ -81,7 +81,7 @@ for item in range(len(total_elements)):
         By.CSS_SELECTOR,
         'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
     ).text
-    print(f'{(iterator - 3) / 2} ==> {location}')
+    print(f'{int((iterator - 3) / 2)} ==> {location}')
     iterator = iterator + 2
     pharmacies_locations.append(location)
 
@@ -113,10 +113,13 @@ with open('pharmacies.csv', 'w') as csv_file:
             latitude = full_location[1]
         except NoSuchElementException:
             new_converter_query = code.split().pop(1)
+            code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
+            code_converter_input.clear()
+            sleep(1)
+            code_converter_input.send_keys(code)
+            code_converter_input.send_keys(Keys.ENTER)
+            sleep(3)
             try:
-                code_converter_input.clear()
-                code_converter_input.send_keys(new_converter_query)
-                code_converter_input.send_keys(Keys.ENTER)
                 full_location = driver.find_element(
                     By.CSS_SELECTOR,
                     '#details-result-0>p.result-bounds'
