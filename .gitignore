@@ -111,3 +111,4 @@ dist
 *.sqlite3
 *.db
 *.sqlite
+*.csv
