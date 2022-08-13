@@ -62,7 +62,7 @@ total_elements = driver.find_elements(
 
 pharmacies_locations = []
 iterator = 3
-
+new_iterator = 3
 for item in range(len(total_elements)):
     print(iterator)
     try:
@@ -88,11 +88,11 @@ for item in range(len(total_elements)):
 with open('pharmacies.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
     writer.writerow(fields)
+    driver.execute_script("window.open('','_blank')")
+    driver.switch_to.window(driver.window_handles[1])
+    driver.get("https://developers-dot-devsite-v2-prod.appspot.com/maps/documentation/utils/geocoder")
+    sleep(6)
     for code in pharmacies_locations:
-        driver.execute_script("window.open('',"
-                              "'_blank')")
-        driver.get("https://developers-dot-devsite-v2-prod.appspot.com/maps/documentation/utils/geocoder")
-        sleep(16)
         code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
         code_converter_input.send_keys(Keys.CLEAR)
         sleep(1)
@@ -128,36 +128,35 @@ with open('pharmacies.csv', 'w') as csv_file:
             full_location = ['unknown', 'unknown']
             location = full_location[0]
             latitude = full_location[1]
-        driver.close()
         driver.switch_to.window(driver.window_handles[0])
         name = driver.find_element(
             By.XPATH,
             f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
-            f'div[{iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[1]/div/span'
+            f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[1]/div/span'
         ).text
         location = pharmacies_locations[pharmacies_locations.index(code)]
         latitude = latitude
         longitude = longitude
         contact = driver.find_element(
-            By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/'
+            By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{new_iterator}]/'
                       f'div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span[2]/jsl/span[2]'
         ).text
 
         try:
             rating = driver.find_element(
                 By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
-                          f'div[{iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/'
+                          f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/'
                           f'span[2]/span[1]'
             ).text
         except InvalidSelectorException:
             rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]'
+                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{new_iterator}]'
                           f'/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
             ).text
 
         except NoSuchElementException:
             rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]'
+                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{new_iterator}]'
                           f'/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
             ).text
         except error:
@@ -165,4 +164,7 @@ with open('pharmacies.csv', 'w') as csv_file:
         iterator = +2
         writer.writerow([name, location, contact, rating, latitude, longitude])
         sleep(1)
+        driver.switch_to.window(driver.window_handles[1])
+        sleep(2)
+        new_iterator = new_iterator + 2
     csv_file.close()
