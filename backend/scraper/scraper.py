@@ -81,7 +81,7 @@ for item in range(len(total_elements)):
         By.CSS_SELECTOR,
         'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
     ).text
-    print(f'{(iterator-3)/2} ==> {location}')
+    print(f'{(iterator - 3) / 2} ==> {location}')
     iterator = iterator + 2
     pharmacies_locations.append(location)
 
@@ -108,24 +108,40 @@ with open('pharmacies.csv', 'w') as csv_file:
             [full_location.pop() for i in range(2)]
             full_location.pop(0)
             full_location = full_location[0]
-            full_location.split(',')
+            full_location = full_location.split(',')
             longitude = full_location[0]
             latitude = full_location[1]
         except NoSuchElementException:
-            new_converter_query = code.split().pop(1)
-            code_converter_input.clear()
-            code_converter_input.send_keys(new_converter_query)
-            code_converter_input.send_keys(Keys.ENTER)
-            full_location = driver.find_element(
-                By.CSS_SELECTOR,
-                '#details-result-0>p.result-bounds'
-            ).text.split()
-            [full_location.pop() for i in range(2)]
-            full_location.pop(0)
-            full_location = full_location[0]
-            full_location.split(',')
-            longitude = full_location[0]
-            latitude = full_location[1]
+            try:
+                new_converter_query = code.split().pop(1)
+                code_converter_input.clear()
+                code_converter_input.send_keys(new_converter_query)
+                code_converter_input.send_keys(Keys.ENTER)
+                full_location = driver.find_element(
+                    By.CSS_SELECTOR,
+                    '#details-result-0>p.result-bounds'
+                ).text.split()
+                [full_location.pop() for i in range(2)]
+                full_location.pop(0)
+                full_location = full_location[0]
+                full_location = full_location.split(',')
+                longitude = full_location[0]
+                latitude = full_location[1]
+            except NoSuchElementException:
+                try:
+                    full_location = driver.find_element(
+                        By.CSS_SELECTOR, '#details-result-0>p.result-viewport'
+                    ).text.split()
+                    [full_location.pop() for i in range(2)]
+                    full_location.pop(0)
+                    full_location = full_location[0]
+                    full_location = full_location.split(',')
+                    longitude = full_location[0]
+                    latitude = full_location[1]
+                except NoSuchElementException:
+                    full_location = ['unknown', 'unknown']
+                    location = full_location[0]
+                    latitude = full_location[1]
         except InvalidSelectorException:
             full_location = ['unknown', 'unknown']
             location = full_location[0]
@@ -140,11 +156,19 @@ with open('pharmacies.csv', 'w') as csv_file:
         location = pharmacies_locations[pharmacies_locations.index(code)]
         latitude = latitude
         longitude = longitude
-        contact = driver.find_element(
-            By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{new_iterator}]/'
-                      f'div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span[2]/jsl/span[2]'
-        ).text
-
+        try:
+            contact = driver.find_element(
+                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div['
+                          f'{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span[2]/jsl/span[2]'
+            ).text
+        except NoSuchElementException:
+            try:
+                contact = driver.find_element(
+                    By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div['
+                              f'{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span/jsl/'
+                              f'span[2]').text
+            except NoSuchElementException:
+                contact = 'No Contact Info'
         try:
             rating = driver.find_element(
                 By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
@@ -158,17 +182,18 @@ with open('pharmacies.csv', 'w') as csv_file:
             ).text
 
         except NoSuchElementException:
-            rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
-                          f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
-            ).text
-        except error:
-            rating = f'No reviews'
+            try:
+                rating = driver.find_element(
+                    By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
+                              f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
+                ).text
+            except NoSuchElementException:
+                rating = 'No reviews'
         writer.writerow([name, location, contact, rating, latitude, longitude])
         sleep(1)
         driver.switch_to.window(driver.window_handles[1])
         sleep(2)
         new_iterator = new_iterator + 2
         print(new_iterator)
-        print(f'{(new_iterator-3)/2} ===> {[name, location, contact, rating, latitude, longitude]}')
+        print(f'{(new_iterator - 3) / 2} ===> {[name, location, contact, rating, latitude, longitude]}')
     csv_file.close()
