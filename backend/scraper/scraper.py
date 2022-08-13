@@ -99,7 +99,8 @@ with open('pharmacies.csv', 'w') as csv_file:
         code_converter_input.send_keys(code)
         code_converter_input.send_keys(Keys.ENTER)
         sleep(3)
-        if driver.find_element(By.CSS_SELECTOR, '#status-line>span.OK'):
+        try:
+            driver.find_element(By.CSS_SELECTOR, '#status-line>span.OK')
             full_location = driver.find_element(
                 By.CSS_SELECTOR,
                 '#details-result-0>p.result-bounds'
@@ -110,8 +111,8 @@ with open('pharmacies.csv', 'w') as csv_file:
             full_location.split(',')
             longitude = full_location[0]
             latitude = full_location[1]
-        elif driver.find_element(By.CSS_SELECTOR, '#status-line>span.ZERO_RESULTS'):
-            new_converter_query = [code].pop(1)
+        except NoSuchElementException:
+            new_converter_query = code.split().pop(1)
             code_converter_input.send_keys(new_converter_query)
             code_converter_input.send_keys(Keys.ENTER)
             full_location = driver.find_element(
@@ -124,7 +125,7 @@ with open('pharmacies.csv', 'w') as csv_file:
             full_location.split(',')
             longitude = full_location[0]
             latitude = full_location[1]
-        else:
+        except InvalidSelectorException:
             full_location = ['unknown', 'unknown']
             location = full_location[0]
             latitude = full_location[1]
@@ -150,21 +151,22 @@ with open('pharmacies.csv', 'w') as csv_file:
             ).text
         except InvalidSelectorException:
             rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{new_iterator}]'
-                          f'/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
+                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
+                          f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
             ).text
 
         except NoSuchElementException:
             rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{new_iterator}]'
-                          f'/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
+                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
+                          f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
             ).text
         except error:
             rating = f'No reviews'
-        iterator = +2
         writer.writerow([name, location, contact, rating, latitude, longitude])
         sleep(1)
         driver.switch_to.window(driver.window_handles[1])
         sleep(2)
         new_iterator = new_iterator + 2
+        print(new_iterator)
+        print(f'{(new_iterator-3)/2} ===> {[name, location, contact, rating, latitude, longitude]}')
     csv_file.close()
