@@ -64,7 +64,6 @@ pharmacies_locations = []
 iterator = 3
 new_iterator = 3
 for item in range(len(total_elements)):
-    print(iterator)
     try:
         driver.find_element(
             By.XPATH,
@@ -82,6 +81,7 @@ for item in range(len(total_elements)):
         By.CSS_SELECTOR,
         'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
     ).text
+    print(f'{(iterator-3)/2} ==> {location}')
     iterator = iterator + 2
     pharmacies_locations.append(location)
 
@@ -113,6 +113,7 @@ with open('pharmacies.csv', 'w') as csv_file:
             latitude = full_location[1]
         except NoSuchElementException:
             new_converter_query = code.split().pop(1)
+            code_converter_input.send_keys(Keys.CLEAR)
             code_converter_input.send_keys(new_converter_query)
             code_converter_input.send_keys(Keys.ENTER)
             full_location = driver.find_element(
@@ -129,6 +130,7 @@ with open('pharmacies.csv', 'w') as csv_file:
             full_location = ['unknown', 'unknown']
             location = full_location[0]
             latitude = full_location[1]
+        code_converter_input.send_keys(Keys.CLEAR)
         driver.switch_to.window(driver.window_handles[0])
         name = driver.find_element(
             By.XPATH,
