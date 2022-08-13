@@ -77,7 +77,7 @@ for item in range(len(total_elements)):
                 f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
             )
         )
-    sleep(30)
+    sleep(16)
     location = driver.find_element(
         By.CSS_SELECTOR,
         'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
@@ -89,9 +89,9 @@ with open('pharmacies.csv', 'w') as csv_file:
     writer = csv.writer(csv_file)
     writer.writerow(fields)
     for code in pharmacies_locations:
-        driver.find_element(By.TAG_NAME('body')).send_keys(Keys.CONTROL + 't')
+        driver.execute_script("window.open('https://developers.google.com/maps/documentation/geocoding/overview',"
+                              "'_blank')")
         sleep(3)
-        driver.get('https://developers.google.com/maps/documentation/geocoding/overview')
         sleep(12)
         code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
         code_converter_input.send_keys(Keys.CLEAR)
