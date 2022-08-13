@@ -91,8 +91,7 @@ with open('pharmacies.csv', 'w') as csv_file:
     for code in pharmacies_locations:
         driver.execute_script("window.open('https://developers.google.com/maps/documentation/geocoding/overview',"
                               "'_blank')")
-        sleep(3)
-        sleep(12)
+        sleep(16)
         code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
         code_converter_input.send_keys(Keys.CLEAR)
         sleep(1)
