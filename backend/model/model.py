@@ -1,3 +1,4 @@
+import pandas as pd
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
@@ -38,3 +39,6 @@ db.session.add(
     )
 )
 db.session.commit()
+
+pharmacies = pd.read_csv('../scraper/pharmacies.csv')
+pharmacies.to_sql('pharmacies', con=db.engine, if_exists='append', index=False)
