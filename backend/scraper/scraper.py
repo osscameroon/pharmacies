@@ -13,106 +13,106 @@ from selenium.webdriver.remote.errorhandler import NoSuchElementException, Inval
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 driver.maximize_window()
-driver.get('https://www.google.com/maps/')
-search_input = driver.find_element(By.NAME, 'q')
+query_array = ['yaounde']
+# query_array = ['yaounde', 'douala', 'garoua', 'buea', 'bamenda', 'maroua', 'bertoua', 'ngaroundere', 'baffousam']
+for cities in query_array:
+    driver.get('https://www.google.com/maps/')
+    search_input = driver.find_element(By.NAME, 'q')
 
-search_input.send_keys('Pharmacies')
-sleep(3)
-search_input.send_keys(Keys.ENTER)
+    search_input.send_keys(f'Pharmacies {cities}')
+    sleep(3)
+    search_input.send_keys(Keys.ENTER)
 
-sleep(14)
+    sleep(14)
 
-query_results = driver.find_element(
-    By.CSS_SELECTOR,
-    'div.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd>div.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd'
-)
+    query_results = driver.find_element(
+        By.CSS_SELECTOR,
+        'div.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd>div.m6QErb.DxyBCb.kA9KIf.dS8AEf.ecceSd'
+    )
 
-vertical_ordinate = 100
+    vertical_ordinate = 100
 
-fields = ['Name', 'Location', 'Contact', 'Rating', 'Latitude', 'Longitude']
+    fields = ['Name', 'Location', 'Contact', 'Rating', 'Latitude', 'Longitude', 'Images']
 
-while True:
-    driver.execute_script(
-        "arguments[0].scrollTop = arguments[1]", query_results, vertical_ordinate)
-    vertical_ordinate += 100
-    sleep(1)
-    try:
-        driver.find_element(
-            By.XPATH, '/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]'
-                      '/div[243]/div/p/span/span[1]'
-        )
-        print(
+    while True:
+        driver.execute_script(
+            "arguments[0].scrollTop = arguments[1]", query_results, vertical_ordinate)
+        vertical_ordinate += 100
+        sleep(1)
+        try:
             driver.find_element(
                 By.XPATH, '/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]'
                           '/div[243]/div/p/span/span[1]'
-            ).text
-        )
-        break
-    except InvalidSelectorException:
-        pass
-    except NoSuchElementException:
-        pass
-sel = Selector(text=driver.page_source)
+            )
+            print(
+                driver.find_element(
+                    By.XPATH, '/html/body/div[3]/div[9]/div[9]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]'
+                              '/div[243]/div/p/span/span[1]'
+                ).text
+            )
+            break
+        except InvalidSelectorException:
+            pass
+        except NoSuchElementException:
+            pass
 
-total_elements = driver.find_elements(
-    By.CSS_SELECTOR, 'div.lI9IFe>div.y7PRA>div>div>div>div.NrDZNb>div>span'
-)
+    total_elements = driver.find_elements(
+        By.CSS_SELECTOR, 'div.lI9IFe>div.y7PRA>div>div>div>div.NrDZNb>div>span'
+    )
 
-[print(f'{total_elements.index(item) + 1} ==> {item.text.capitalize()}') for item in total_elements]
+    [print(f'{total_elements.index(item) + 1} ==> {item.text.capitalize()}') for item in total_elements]
 
-pharmacies_locations = []
-iterator = 3
-new_iterator = 3
-for item in range(len(total_elements)):
-    try:
-        driver.find_element(
-            By.XPATH,
-            f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
-        ).click()
-    except ElementClickInterceptedException:
-        driver.execute_script(
-            "arguments[0].click();", driver.find_element(
+    pharmacies_locations = []
+    images_links = []
+    iterator = 3
+    new_iterator = 3
+    for item in range(len(total_elements)):
+        sel = Selector(text=driver.page_source)
+        try:
+            driver.find_element(
                 By.XPATH,
                 f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
+            ).click()
+        except ElementClickInterceptedException:
+            driver.execute_script(
+                "arguments[0].click();", driver.find_element(
+                    By.XPATH,
+                    f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div[{iterator}]/div/a'
+                )
             )
-        )
-    sleep(16)
-    location = driver.find_element(
-        By.CSS_SELECTOR,
-        'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
-    ).text
-    print(f'{int((iterator - 3) / 2)} ==> {location}')
-    iterator = iterator + 2
-    pharmacies_locations.append(location)
-
-with open('pharmacies.csv', 'w') as csv_file:
-    writer = csv.writer(csv_file)
-    writer.writerow(fields)
-    driver.execute_script("window.open('','_blank')")
-    driver.switch_to.window(driver.window_handles[1])
-    driver.get("https://developers-dot-devsite-v2-prod.appspot.com/maps/documentation/utils/geocoder")
-    sleep(6)
-    for code in pharmacies_locations:
-        code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
-        code_converter_input.clear()
-        sleep(1)
-        code_converter_input.send_keys(code)
-        code_converter_input.send_keys(Keys.ENTER)
-        sleep(3)
+        sleep(16)
+        location = driver.find_element(
+            By.CSS_SELECTOR,
+            'div:nth-child(3)>button>div.AeaXub>div.rogA2c>div.Io6YTe.fontBodyMedium'
+        ).text
+        print(f'{int((iterator - 3) / 2)} ==> {location}')
+        iterator = iterator + 2
+        pharmacies_locations.append(location)
         try:
-            driver.find_element(By.CSS_SELECTOR, '#status-line>span.OK')
-            full_location = driver.find_element(
-                By.CSS_SELECTOR,
-                '#details-result-0>p.result-bounds'
-            ).text.split()
-            [full_location.pop() for i in range(2)]
-            full_location.pop(0)
-            full_location = full_location[0]
-            full_location = full_location.split(',')
-            longitude = full_location[0]
-            latitude = full_location[1]
+            pharmacy_image = driver.find_element(
+                By.XPATH,
+                '//*[@id="QA0Szd"]/div/div/div[1]/div[3]/div/div[1]/div/div/div[2]/div[1]/div[1]/button/img'
+            ).get_attribute('src')
+            images_links.append(pharmacy_image)
         except NoSuchElementException:
-            new_converter_query = code.split().pop(1)
+            try:
+                pharmacy_image = driver.find_element(
+                    By.XPATH,
+                    '//*[@id="QA0Szd"]/div/div/div[1]/div[3]/div/div[1]/div/div/div[2]/div[1]/div[1]/div/img'
+                ).get_attribute('src')
+                images_links.append(pharmacy_image)
+            except NoSuchElementException:
+                pharmacy_image = 'No Image Found'
+                images_links.append(pharmacy_image)
+
+    with open(f'pharmacies-{cities}.csv', 'w') as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(fields)
+        driver.execute_script("window.open('','_blank')")
+        driver.switch_to.window(driver.window_handles[1])
+        driver.get("https://developers-dot-devsite-v2-prod.appspot.com/maps/documentation/utils/geocoder")
+        sleep(6)
+        for code in pharmacies_locations:
             code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
             code_converter_input.clear()
             sleep(1)
@@ -120,9 +120,10 @@ with open('pharmacies.csv', 'w') as csv_file:
             code_converter_input.send_keys(Keys.ENTER)
             sleep(3)
             try:
+                driver.find_element(By.CSS_SELECTOR, '#status-line>span.OK')
                 full_location = driver.find_element(
                     By.CSS_SELECTOR,
-                    '#details-result-0>p.result-bounds'
+                    '#details-result-0>p.result-viewport'
                 ).text.split()
                 [full_location.pop() for i in range(2)]
                 full_location.pop(0)
@@ -131,9 +132,19 @@ with open('pharmacies.csv', 'w') as csv_file:
                 longitude = full_location[0]
                 latitude = full_location[1]
             except NoSuchElementException:
+                new_converter_query = code.split()
+                new_converter_query.pop(1)
+                new_converter_query = new_converter_query[0] + ',' + new_converter_query[1]
+                code_converter_input = driver.find_element(By.CSS_SELECTOR, '#query-input')
+                code_converter_input.clear()
+                sleep(1)
+                code_converter_input.send_keys(new_converter_query)
+                code_converter_input.send_keys(Keys.ENTER)
+                sleep(3)
                 try:
                     full_location = driver.find_element(
-                        By.CSS_SELECTOR, '#details-result-0>p.result-viewport'
+                        By.CSS_SELECTOR,
+                        '#details-result-0>p.result-viewport'
                     ).text.split()
                     [full_location.pop() for i in range(2)]
                     full_location.pop(0)
@@ -142,59 +153,71 @@ with open('pharmacies.csv', 'w') as csv_file:
                     longitude = full_location[0]
                     latitude = full_location[1]
                 except NoSuchElementException:
-                    location = 'unknown'
-                    latitude = 'unknown'
-        except InvalidSelectorException:
-            location = 'unknown'
-            latitude = 'unknown'
-        code_converter_input.clear()
-        driver.switch_to.window(driver.window_handles[0])
-        name = driver.find_element(
-            By.XPATH,
-            f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
-            f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[1]/div/span'
-        ).text
-        location = pharmacies_locations[pharmacies_locations.index(code)]
-        latitude = latitude
-        longitude = longitude
-        try:
-            contact = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div['
-                          f'{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span[2]/jsl/span[2]'
+                    try:
+                        full_location = driver.find_element(
+                            By.CSS_SELECTOR, '#details-result-0>p.result-viewport'
+                        ).text.split()
+                        [full_location.pop() for i in range(2)]
+                        full_location.pop(0)
+                        full_location = full_location[0]
+                        full_location = full_location.split(',')
+                        longitude = full_location[0]
+                        latitude = full_location[1]
+                    except NoSuchElementException:
+                        location = 'unknown'
+                        latitude = 'unknown'
+            except InvalidSelectorException:
+                location = 'unknown'
+                latitude = 'unknown'
+            code_converter_input.clear()
+            driver.switch_to.window(driver.window_handles[0])
+            name = driver.find_element(
+                By.XPATH,
+                f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
+                f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[1]/div/span'
             ).text
-        except NoSuchElementException:
+            location = pharmacies_locations[pharmacies_locations.index(code)]
+            image = images_links[pharmacies_locations.index(code)]
+            latitude = latitude
+            longitude = longitude
             try:
                 contact = driver.find_element(
                     By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div['
-                              f'{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span/jsl/'
-                              f'span[2]').text
+                              f'{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span[2]/jsl/span[2]'
+                ).text
             except NoSuchElementException:
-                contact = 'No Contact Info'
-        try:
-            rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
-                          f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/'
-                          f'span[2]/span[1]'
-            ).text
-        except InvalidSelectorException:
-            rating = driver.find_element(
-                By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
-                          f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
-            ).text
-
-        except NoSuchElementException:
+                try:
+                    contact = driver.find_element(
+                        By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/div['
+                                  f'{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[4]/div[2]/span/jsl/'
+                                  f'span[2]').text
+                except NoSuchElementException:
+                    contact = 'No Contact Info'
             try:
+                rating = driver.find_element(
+                    By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
+                              f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/'
+                              f'span[2]/span[1]'
+                ).text
+            except InvalidSelectorException:
                 rating = driver.find_element(
                     By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
                               f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
                 ).text
+
             except NoSuchElementException:
-                rating = 'No reviews'
-        writer.writerow([name, location, contact, rating, latitude, longitude])
-        sleep(1)
-        driver.switch_to.window(driver.window_handles[1])
-        sleep(2)
-        new_iterator = new_iterator + 2
-        print(f'{int((new_iterator - 3) / 2)} ===> {[name, location, contact, rating, latitude, longitude]}')
-    csv_file.close()
+                try:
+                    rating = driver.find_element(
+                        By.XPATH, f'//*[@id="QA0Szd"]/div/div/div[1]/div[2]/div/div[1]/div/div/div[2]/div[1]/'
+                                  f'div[{new_iterator}]/div/div[2]/div[2]/div[1]/div/div/div/div[3]/div/span[2]/span[1]'
+                    ).text
+                except NoSuchElementException:
+                    rating = 'No reviews'
+            writer.writerow([name, location, contact, rating, latitude, longitude, image])
+            sleep(1)
+            driver.switch_to.window(driver.window_handles[1])
+            sleep(2)
+            new_iterator = new_iterator + 2
+            print(f'{int((new_iterator - 3) / 2)} ===> {[name, location, contact, rating, latitude, longitude, image]}')
+        csv_file.close()
 driver.close()
